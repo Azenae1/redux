@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createAsyncThunk, createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface CounterState {
     value: number;
@@ -21,9 +21,22 @@ const CounterSlice = createSlice ({
         incrementByAmount: (state, action: PayloadAction<number>) => {
             state.value += action.payload;
         }
-        
+    },
+    extraReducers: (builder) => {
+        builder.addCase(incrementAsync.pending, () => {
+            console.log("incremantAsync.pending");
+        }).addCase(incrementAsync.fulfilled, (state, action:PayloadAction<number>) => {
+            state.value += action.payload;
+        })
     },
 })
+
+export const incrementAsync = createAsyncThunk("counter/incrementAsync", 
+    async (amount: number) => {
+    await new Promise((resolve) => setTimeout(resolve, 1000));
+    return amount;
+}
+);
 
 export const {increment, decrement, incrementByAmount } = CounterSlice.actions;
 export default CounterSlice.reducer; 
